@@ -79,7 +79,7 @@ function modifyContentBetweenComments(fileContent, newContent) {
 }
 
 const createRepository = async (username, folderName) => {
-  console.log("Creating repo");
+  console.log("Creating repo"); //create repo
   try {
     const updatedFolderPath = path.join(__dirname, folderName);
     const repositoryResponse = await axios.post(
@@ -98,10 +98,13 @@ const createRepository = async (username, folderName) => {
 
     console.log("Repository created:", repositoryResponse.data.html_url);
     console.log(repositoryResponse.data.html_url);
-    // await createNetlifySite(username, repositoryResponse.data.html_url);
-    // console.log("hosted successfull");
-    await gitCommands(folderName, repositoryResponse.data.html_url);
+    await gitCommands(folderName, repositoryResponse.data.html_url); //npm i , npm run build , git upload
     console.log("git uploaded");
+
+    //host in github pages
+
+    // await createNetlifySite(username, repositoryResponse.data.html_url); // host on netlify
+    // console.log("hosted successfull");
     
   } catch (error) {
     console.error("Error creating reposity:", error.response?.data);
@@ -188,7 +191,7 @@ async function gitCommands(folderName, repoLink) {
     await execa('npm', ['run', 'build'], { cwd: repoPath, stdio: 'inherit' });
 
     // Switch to the gh-pages branch or create it if it doesn't exist
-    await git.checkoutLocalBranch("gh-pages");
+    // await git.checkoutLocalBranch("template");
 
     // Add the contents of the "dist" folder
     await git.add('dist');
@@ -209,7 +212,7 @@ async function gitCommands(folderName, repoLink) {
     );
 
     // Push the changes to GitHub Pages branch
-    await git.push(['-u', 'origin', 'gh-pages']);
+    await git.push(['-u', 'origin', 'template']);
 
     process.chdir('..');
     console.log('Git commands executed successfully.');
@@ -246,7 +249,7 @@ async function createNetlifySite(netlifySiteName, githubRepo) {
       }
     );
 
-    console.log(createSiteResponse);
+    console.log(createSiteResponse?.status);
 
     console.log(`New Netlify site created: ${netlifySiteName}`);
   } catch (error) {
