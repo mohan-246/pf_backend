@@ -19,7 +19,7 @@ const instance = sdk("@render-api/v1.0#aiie8wizhlp1is9bu");
 
 dotenv.config();
 
-let i = 1;
+let PortfolioCount = 1;
 const app = express();
 const port = 3001;
 const githubToken = process.env.GITHUB_ACCESS_TOKEN;
@@ -104,9 +104,7 @@ const createRepository = async (username, folderName , buildPath) => {
 
     console.log("Repository created:", repositoryResponse.data.html_url); //
     console.log(repositoryResponse.data.html_url);
-    // await createNetlifySite(username, repositoryResponse.data.html_url);
-    // console.log("hosted successfull");
-
+    
     await gitCommands(
       folderName,
       repositoryResponse.data.html_url,
@@ -121,21 +119,7 @@ const createRepository = async (username, folderName , buildPath) => {
 };
 
 function getNewContent(body) {
-  let newContent,
-    assetsFolder,
-    filePath,
-    emailAddress,
-    navName,
-    about1Paragraph,
-    about2HeadingText,
-    about2Paragraph,
-    about3Paragraph,
-    linkedInLink,
-    instagramLink,
-    twitterLink,
-    para,
-    repoPath,
-    buildPath;
+  let newContent, assetsFolder, filePath, emailAddress, navName, about1Paragraph, about2HeadingText, about2Paragraph, about3Paragraph, linkedInLink, instagramLink, twitterLink, gitHubLink, para, repoPath, buildPath, tagline, heroLine1, heroLine2, heroLine3, project1Title, project2Title, project3Title, project4Title, project5Title, project6Title, project1Link, project2Link, project3Link, project4Link, project5Link, project6Link, aboutLine1, aboutLine2, aboutLine3, aboutLine4, aboutPara1, aboutPara2, aboutPara3, aboutPara4, aboutHead2, aboutHead3, aboutHead4;
 
   switch (body.variant) {
     case "Photography-Portfolio-1":
@@ -162,7 +146,12 @@ function getNewContent(body) {
         const instagramLink = "${instagramLink}";
         const twitterLink = "${twitterLink}";`;
 
-      assetsFolder = "./Photography-Portfolio-1/src/assets";
+      assetsFolder =  path.join(
+        __dirname,
+        "photography-portfolio-1",
+        "src",
+        "assets"
+      );
       filePath = path.join(
         __dirname,
         "photography-portfolio-1",
@@ -183,7 +172,12 @@ function getNewContent(body) {
         const linkedIn = "${linkedInLink}";
         const para = "${para}";`;
 
-      assetsFolder = "/PhotographerPortfolio/src/assets";
+      assetsFolder =  path.join(
+        __dirname,
+        "PhotographerPortfolio",
+        "src",
+        "assets"
+      );
       filePath = path.join(
         __dirname,
         "PhotographerPortfolio",
@@ -193,8 +187,49 @@ function getNewContent(body) {
       repoPath = "PhotographerPortfolio"
       buildPath = "build"
       break;
-
+    
+    case "Developer-Portfolio-1":
+      ({navName , emailAddress , linkedInLink, instagramLink, twitterLink, gitHubLink, tagline, heroLine1, heroLine2, heroLine3, project1Title, project2Title, project3Title, project4Title, project5Title, project6Title, project1Link, project2Link, project3Link, project4Link, project5Link, project6Link, aboutLine1, aboutLine2, aboutLine3, aboutLine4, aboutPara1, aboutPara2, aboutPara3, aboutPara4, aboutHead2, aboutHead3, aboutHead4} = body)
+      newContent = `
+      const tagline = '${tagline}';
+      const name = '${navName}';
+      const email = '${emailAddress}';
+      const heroLine1 = '${heroLine1}';
+      const heroLine2 = '${heroLine2}';
+      const heroLine3 = '${heroLine3}';
+      const gitHub = '${gitHubLink}';
+      const linkedIn = '${linkedInLink}';
+      const twitter = '${twitterLink}';
+      const project1 = ['${project1Title}', '${project1Link}', null, 'pic1.png'];
+      const project2 = ['${project2Title}', '${project2Link}', null, 'pic2.png'];
+      const project3 = ['${project3Title}', '${project3Link}', null, 'pic3.png'];
+      const project4 = ['${project4Title}', '${project4Link}', null, 'pic4.png'];
+      const project5 = ['${project5Title}', '${project5Link}', null, 'pic5.png'];
+      const project6 = ['${project6Title}', '${project6Link}', null, 'pic6.png'];
+      const aboutLine1= "${aboutLine1}";
+      const aboutLine2= '${aboutLine2}';
+      const aboutLine3= '${aboutLine3}';
+      const aboutLine4= '${aboutLine4}';
+      const aboutPara1= '${aboutPara1}';
+      const aboutPara2= '${aboutPara2}';
+      const aboutPara3= '${aboutPara3}';
+      const aboutPara4= '${aboutPara4}';
+      const aboutHead2= '${aboutHead2}';
+      const aboutHead3= '${aboutHead3}';
+      const aboutHead4= '${aboutHead4}';
+      const aboutImage= [null, 'pic7.png'];`
+      assetsFolder = path.join(__dirname,"Portfolio","public");
+      repoPath = "Portfolio"
+      buildPath = "dist"
+      filePath = path.join(
+        __dirname,
+        "Portfolio",
+        "src",
+        "App.jsx"
+      );
+      break;
     default:
+      console.log("unknown variant: ",body.variant)
       break;
   }
 
@@ -236,7 +271,7 @@ console.log(folderName , repoLink , username)
     console.log("Uploaded to GitHub successfully.");
    
   } catch (error) {
-    console.error("Error Uploading to GitHub :", error?.message);
+    console.error("Error Uploading to GitHub :", error?.message); // GN BRUH ;)
   }
 }
 
@@ -268,7 +303,7 @@ app.post("/upload", upload.array("file"), async (req, res) => {
     modifyFile(newContent, filePath);
 
     let i = 1;
-    console.log(req.files?.length);
+    console.log(req.files?.length,assetsFolder);
     req.files.forEach((file) => {
       const filePath = `${assetsFolder}/pic${i}.png`;
       fs.writeFileSync(filePath, file.buffer);
@@ -276,7 +311,7 @@ app.post("/upload", upload.array("file"), async (req, res) => {
     });
     console.log("paths" ,assetsFolder , filePath)
     createRepository(
-      `${req.body.navName ? req.body.navName : "Portfoliify"} Portfolio-${i++}`,
+      `${req.body.navName ? req.body.navName : "Portfoliify"} Portfolio-${PortfolioCount++}`,
       repoPath , 
       buildPath
     );
